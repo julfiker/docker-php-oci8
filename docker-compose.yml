@@ -1,0 +1,41 @@
+
+services:
+  php-apache:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: php-apache
+    volumes:
+      - ./src:/var/www/html/
+    ports:
+      - "8080:80"
+    depends_on:
+      - oracle-db
+    networks:
+      - todo-net
+    environment:
+      ORACLE_HOST: oracle-db
+      ORACLE_PORT: 1521
+      ORACLE_SID: XE
+      ORACLE_USER: todo_user
+      ORACLE_PASSWORD: todo_pass
+
+  oracle-db:
+    image: gvenzl/oracle-xe:11.2.0.2
+    container_name: oracle-db
+    ports:
+      - "1521:1521"
+    environment:
+      - ORACLE_PASSWORD=oracle
+      - APP_USER=todo_user
+      - APP_USER_PASSWORD=todo_pass
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+    networks:
+      - todo-net
+
+volumes:
+  oracle_data:
+
+networks:
+  todo-net:
